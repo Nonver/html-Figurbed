@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>图片管理</title>
+		<link rel="stylesheet" type="text/css" href="css/layui.css" />
+		<style type="text/css">
+			.breadcrumb {
+				width: 95%;
+				margin: auto;
+				display: flex;
+				flex-direction: row;
+				justify-content: flex-end;
+				margin: 1rem 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="breadcrumb">
+				<span class="layui-breadcrumb">
+					<a href="index.html">首页</a>
+					<a @click="an">退出登录</a>
+				</span>
+			</div>
+			<table class="layui-hide" id="test" lay-filter="test"></table>
+			<script type="text/html" id="barDemo">
+				
+				<a class="layui-btn layui-btn-xs" lay-event="edit">查看</a>
+				<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+			</script>
+		</div>
+		<script src="../src/js/jquery-3.5.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="./layui.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../src/js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../src/js/wyq.js" type="text/javascript" charset="utf-8"></script>
+		<script>
+			
+			layui.use('table', function() {
+				var table = layui.table;
+				var nameData = JSON.parse(sessionStorage.getItem('phone'));
+				var value = '';
+				var that = this;
+				table.render({
+					elem: '#test',
+					url: 'select.php',
+					toolbar: '#toolbarDemo',
+					request: {
+						pageName: 'page',
+						limitName: 'top'
+					},
+					parseData: function(res) { //res 即为原始返回的数据
+						let data = res.dwz;
+						for (let i = 0; i < data.length; i++) {
+							data[i].name = nameData.ImgName
+							data[i].IP = nameData.IP
+						}
+						return {
+							"code": 0,
+							"msg": "",
+							"count": res.totla[0].totla,
+							"data": data,
+						};
+					},
+					where: {
+						uid: nameData.id,
+						page: $(".layui-laypage-skip").find("input").val(),
+					},
+					defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+						title: '提示',
+						layEvent: 'LAYTABLE_TIPS',
+						icon: 'layui-icon-tips'
+					}],
+					title: '用户数据表',
+					cols: [
+						[{
+							type: 'checkbox',
+							fixed: 'left'
+						}, {
+							field: 'id',
+							title: 'ID',
+							width: 80,
+							fixed: 'left',
+							unresize: true,
+							sort: true
+						}, {
+							field: 'name',
+							title: '用户名',
+							width: 150,
+							// edit: 'text'
+						}, {
+							field: 'IP',
+							title: 'IP',
+							width: 180
+						}, {
+							field: 'url',
+							title: 'URL',
+							// edit: 'text'
+						}, {
+							field: 'timeImg',
+							title: '上传时间',
+						}, {
+							fixed: 'right',
+							title: '操作',
+							toolbar: '#barDemo',
+							width: 200
+
+						}]
+					],
+					page: true
+				});
+				//头工具栏事件
+				table.on('toolbar(test)', function(obj) {
+					var checkStatus = table.checkStatus(obj.config.id);
+					switch (obj.event) {
+						case 'getCheckData':
+							var data = checkStatus.data;
+							layer.alert(JSON.stringify(data));
+							break;
+						case 'getCheckLength':
+							var data = checkStatus.data;
+							layer.msg('选中了：' + data.length + ' 个');
+							break;
+						case 'isAll':
+							layer.msg(checkStatus.isAll ? '全选' : '未全选');
+							break;
+
+							//自定义头工具栏右侧图标 - 提示
+						case 'LAYTABLE_TIPS':
+							layer.alert('这是工具栏右侧自定义的一个图标按钮');
+							break;
+					};
+				});
+
+				//监听行工具事件
+				table.on('tool(test)', function(obj) {
+					var data = obj.data;
+					if (obj.event === 'del') {
+						layer.confirm('真的删除行么', function(index) {
+							wyq.ajax(function(ret, err, dat) {
+								console.log(ret)
+							}, "del.php", "post", {
+								id:data.id
+							}, {});
+							layer.msg('删除成功');
+							setTimeout(function() {
+								location.href = './management.html'
+							}, 1000)
+							
+						});
+					} else if (obj.event === 'edit') {
+						let cmd = obj.data.url.substring(2,);
+						let url = window.location.host;
+						url = 'http://'+url+'/dome/'+cmd;
+						console.log(url)
+						layer.open({
+						  type: 1,
+						  title: false,
+						  closeBtn: 0,
+						  shadeClose: true,
+						  skin: 'yourclass',
+						  content: '<img src='+url+'>'
+						});
+					}
+				});
+			});
+		</script>
+		<script type="text/javascript">
+			var app = new Vue({
+				el: "#app",
+				data: {
+					is: false,
+					data: [],
+					val:0
+				},
+				created() {},
+				updated() {
+
+				},
+				methods: {
+					an() {
+						layer.msg('即将退出登录')
+						sessionStorage.removeItem("is");
+						setTimeout(function() {
+							location.href = './index.html'
+						}, 1000)
+					},
+				}
+			})
+		</script>
+	</body>
+</html>

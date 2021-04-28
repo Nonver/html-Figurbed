@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>图库-在线存储</title>
+		<link href="../src/css/jquery.upload.css" type="text/css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/layui.css"/>
+
+		<style>
+			.upload-box {
+				padding: 0 20px;
+				margin: 0 auto;
+				margin-top: 40px;
+			}
+
+			.upload-box .upload-tip {
+				margin-bottom: 20px;
+				font-size: 16px;
+				color: #555;
+			}
+			.breadcrumb {
+				width: 95%;
+				margin: auto;
+				display: flex;
+				flex-direction: row;
+				justify-content: flex-end;
+				margin-top: 1rem;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="breadcrumb" v-if="!is">
+				<span class="layui-breadcrumb">
+					<a href="login.html">登录</a>
+					<a href="registered.html">注册</a>
+				</span>
+			</div>
+			<div class="breadcrumb" v-if="is">
+				<span class="layui-breadcrumb">
+					<a href="management.html">图片管理</a>
+				</span>
+			</div>
+			<div class="upload-box clear">
+				<p class="upload-tip">最多上传5张图片(包含已上传的)，每个图片不能超过1M，向前追加图片，只允许上传png格式图片</p>
+				<div class="image-box1"></div>
+			</div>
+		</div>
+		<script src="https://cdn.staticfile.org/jquery/3.1.0/jquery.min.js"></script>
+		<script src="layui.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../src/js/jquery.upload.js"></script>
+		<script src="../src/js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var app = new Vue({
+				el: "#app",
+				data: {
+					is:false,
+					data:[]
+				},
+				created() {
+					this.cz();
+				},
+				methods: {
+					anck(){
+						layer.msg('即将退出登录')
+						let that = this;
+						setTimeout(function() {
+							sessionStorage.removeItem("is");
+							that.cz();
+							location.href = '../index.html'
+						}, 1000)
+					},
+					cz(){
+						this.data = JSON.parse(sessionStorage.getItem('phone'));
+						console.log(sessionStorage.getItem('is'))
+						if(sessionStorage.getItem('is')=='true'){
+							this.is = true;
+						}else if(sessionStorage.getItem('is') == null){
+							this.is = false;
+						}
+					}
+				}
+			})
+		</script>
+		<script>
+			$(".image-box1").ajaxImageUpload({
+				fileInput: 'file',
+				postUrl: './upload.php', //上传的服务器地址
+				width: 180,
+				height: 180,
+				postData: {
+					csrf: 'token1'
+				},
+				// imageUrl: ['./LongWay/demo1.jpg'],
+				maxNum: 5, //允许上传图片数量
+				allowZoom: true, //允许放大
+				allowType: ['png', 'jpg'], //允许上传图片的类型
+				maxSize: 1, //允许上传图片的最大尺寸，单位M
+				appendMethod: 'before',
+				before: function() {
+					if(sessionStorage.getItem('is') != 'true'){
+						layer.msg('请登录操作')
+						return false;
+					}
+				},
+				success: function(json) {
+					if(json.code == 200){
+						layer.msg('上传成功')
+						return false;
+					}else if(json.code == 302){
+						layer.msg('上传图片数目不能超过5个')
+						return false;
+					}
+				},
+				complete: function(res) {
+					console.log(res)
+				},
+				error: function(e) {
+					console.log(e)
+				}
+			});
+		</script>
+
+	</body>
+</html>

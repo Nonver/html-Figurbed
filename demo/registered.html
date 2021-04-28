@@ -1,0 +1,90 @@
+<!doctype html>
+<html class="x-admin-sm">
+	<head>
+		<meta charset="UTF-8">
+		<title>账号注册</title>
+		<meta name="renderer" content="webkit|ie-comp|ie-stand">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport"
+			content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+		<meta http-equiv="Cache-Control" content="no-siteapp" />
+		<link rel="stylesheet" href="./css/font.css">
+		<link rel="stylesheet" href="./css/login.css">
+		<link rel="stylesheet" href="./css/xadmin.css">
+		<link rel="stylesheet" type="text/css" href="css/layui.css"/>
+		<style type="text/css">
+			.div-an {
+				display: flex;
+				flex-direction: column;
+				justify-content: space-evenly;
+			}
+			.div-an>a{
+				margin-top: 10px;
+			}
+			.x-admin-sm .layui-btn {
+			    height: 48px;
+			    line-height: 48px;
+			    padding: 0 10px;
+			}
+		</style>
+	</head>
+	<body class="login-bg">
+		<div class="login layui-anim layui-anim-up">
+			<div class="message">账号注册</div>
+			<div id="darkbannerwrap"></div>
+			<form method="post" class="layui-form">
+				<input name="phone" placeholder="用户名" type="text" lay-verify="required" class="layui-input">
+				<hr class="hr15">
+				<input name="password" lay-verify="required" placeholder="密码" type="password" class="layui-input">
+				<hr class="hr15">
+				<div class="div-an">
+					<input value="注册" lay-submit lay-filter="login" style="width:100%;" type="submit">
+					<a href="./index.html" class="layui-btn">返回</a>
+				</div>
+				<hr class="hr20">
+			</form>
+			
+		</div>
+		<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+		<script src="layui.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../src/js/wyq.js" type="text/javascript" charset="utf-8"></script>
+		<script>
+			$(function() {
+				layui.use('form', function() {
+					var form = layui.form;
+					form.on('submit(login)', function(data) {
+						let phone = data.field.phone;
+						let password = data.field.password;
+						$.ajax({
+							url: 'registered.php',
+							type: 'post',
+							sync: false,
+							data: {
+								name: phone,
+								password: password
+							},
+							success: function(ret, err) {
+								console.log(ret)
+								let data = JSON.parse(ret)
+								if (data.result == 200) {
+									layer.msg('注册成功')
+									setTimeout(function() {
+										sessionStorage.setItem('phone', JSON.stringify(data.dwz))
+										sessionStorage.setItem('is', true)
+										location.href = '../login.html'
+									}, 1000)
+								} else if (data.result == 400) {
+									layer.msg('登录失败')
+								}else if(data.result == 300){
+									layer.msg('用户名已存在')
+								}
+							}
+						});
+
+						return false;
+					});
+				});
+			})
+		</script>
+	</body>
+</html>
