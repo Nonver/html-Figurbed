@@ -9,3 +9,5 @@
 后台环境：PHP MySQL
 
 上传插件：https://github.com/gouguoyin/ajax-image-upload @gouguoyin
+
+业余时间写了，没写多久，比较粗糙，可用就行啦
