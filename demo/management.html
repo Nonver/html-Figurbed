@@ -25,7 +25,6 @@
 			</div>
 			<table class="layui-hide" id="test" lay-filter="test"></table>
 			<script type="text/html" id="barDemo">
-				
 				<a class="layui-btn layui-btn-xs" lay-event="edit">查看</a>
 				<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 			</script>
@@ -35,7 +34,6 @@
 		<script src="../src/js/vue.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../src/js/wyq.js" type="text/javascript" charset="utf-8"></script>
 		<script>
-			
 			layui.use('table', function() {
 				var table = layui.table;
 				var nameData = JSON.parse(sessionStorage.getItem('phone'));
@@ -137,29 +135,42 @@
 					var data = obj.data;
 					if (obj.event === 'del') {
 						layer.confirm('真的删除行么', function(index) {
-							wyq.ajax(function(ret, err, dat) {
-								console.log(ret)
-							}, "del.php", "post", {
-								id:data.id
-							}, {});
-							layer.msg('删除成功');
-							setTimeout(function() {
-								location.href = './management.html'
-							}, 1000)
-							
+							$.ajax({
+								url: 'del.php',
+								type: 'post',
+								sync: false,
+								data: {
+									id: data.id
+								},
+								success: function(ret, err) {
+									let data = JSON.parse(ret)
+									if (data.result == 200) {
+										layer.msg('删除成功');
+										setTimeout(function() {
+											location.href = './management.html'
+										}, 1000)
+									} else {
+										layer.msg('删除失败');
+										setTimeout(function() {
+											location.href = './management.html'
+										}, 1000)
+									}
+
+								}
+							});
 						});
 					} else if (obj.event === 'edit') {
-						let cmd = obj.data.url.substring(2,);
+						let cmd = obj.data.url.substring(2, );
 						let url = window.location.host;
-						url = 'https://'+url+'/demo/'+cmd;
+						url = 'https://' + url + '/demo/' + cmd;
 						console.log(url)
 						layer.open({
-						  type: 1,
-						  title: false,
-						  closeBtn: 0,
-						  shadeClose: true,
-						  skin: 'yourclass',
-						  content: '<img src='+url+'>'
+							type: 1,
+							title: false,
+							closeBtn: 0,
+							shadeClose: true,
+							skin: 'yourclass',
+							content: '<img src=' + url + '>'
 						});
 					}
 				});
@@ -171,7 +182,7 @@
 				data: {
 					is: false,
 					data: [],
-					val:0
+					val: 0
 				},
 				created() {},
 				updated() {

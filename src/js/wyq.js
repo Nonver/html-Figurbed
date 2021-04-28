@@ -12,7 +12,7 @@ var wyq = {
 		$.ajax({
 			url: wyq.config.url + cmd,
 			type: pos,
-			sync:is,
+			sync: is,
 			data: data,
 			success: function(ret, err) {
 				var dat = ret.data;
