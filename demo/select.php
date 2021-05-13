@@ -14,7 +14,7 @@
 	}else{
 		$num = mysqli_query($com,$select);
 		$new = mysqli_fetch_all($num,MYSQLI_ASSOC);
-		$sum = mysqli_query($com,"select COUNT(*) as totla FROM longway");
+		$sum = mysqli_query($com,"select COUNT(*) as totla FROM longway WHERE uid='". $uid ."'");
 		$sumNew = mysqli_fetch_all($sum,MYSQLI_ASSOC);
 		if ($num) {
 			
